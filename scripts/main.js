@@ -155,3 +155,6 @@ document.getElementById('simuladorForm').addEventListener('submit', function(eve
 // Cargar resultados al iniciar la página
 window.onload = cargarResultados;
 
+
+
+
