@@ -121,8 +121,16 @@ function guardarResultados(prestamo) {
 // Cargar resultados de localStorage
 function cargarResultados() {
     const prestamoGuardado = localStorage.getItem('prestamoGuardado');
-    prestamoGuardado && mostrarResultados(JSON.parse(prestamoGuardado));
+    if (prestamoGuardado) {
+        mostrarResultados(JSON.parse(prestamoGuardado));
+    }
 }
+
+// Limpiar resultados en el DOM y localStorage
+document.getElementById('limpiarResultados').addEventListener('click', function() {
+    localStorage.removeItem('prestamoGuardado');
+    document.getElementById('resultados').innerHTML = ''; // Limpiar el DOM
+});
 
 // Ejecutar el simulador cuando se envíe el formulario
 document.getElementById('simuladorForm').addEventListener('submit', function(event) {
@@ -146,3 +154,4 @@ document.getElementById('simuladorForm').addEventListener('submit', function(eve
 
 // Cargar resultados al iniciar la página
 window.onload = cargarResultados;
+
