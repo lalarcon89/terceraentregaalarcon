@@ -32,20 +32,11 @@ function Prestamo(capital, tasaInteresAnual, años) {
 
         for (let i = 0; i < this.numeroPagos; i++) {
             const interes = saldo * this.tasaInteresMensual;
-            let capital;
-            if (i === this.numeroPagos - 1) {
-                // Última cuota
-                capital = saldo;
-                this.pagoMensual = capital + interes;
-            } else {
-                capital = this.pagoMensual - interes;
-            }
+            const capital = i === this.numeroPagos - 1 ? saldo : this.pagoMensual - interes;
             saldo -= capital;
 
             // Asegurar que el saldo no sea negativo
-            if (saldo < 0) {
-                saldo = 0;
-            }
+            saldo = saldo < 0 ? 0 : saldo;
 
             totalInteres += interes;
             totalPago += this.pagoMensual;
@@ -60,6 +51,10 @@ function Prestamo(capital, tasaInteresAnual, años) {
 
         this.totalInteres = totalInteres;
         this.totalPago = totalPago;
+
+        // Usar spread para copiar el array de detalleAmortizacion
+        const copiaDetalle = [...this.detalleAmortizacion];
+        console.log("Copia del detalle de amortización:", copiaDetalle);
     };
 }
 
@@ -74,6 +69,8 @@ function validarEntrada(valor, mensaje) {
 
 // Mostrar resultados en el DOM
 function mostrarResultados(prestamo) {
+    const { capital, totalInteres, totalPago, detalleAmortizacion } = prestamo;
+
     document.getElementById('resultados').innerHTML = `
         <h2>Detalle del Préstamo</h2>
         <table>
@@ -87,7 +84,7 @@ function mostrarResultados(prestamo) {
                 </tr>
             </thead>
             <tbody>
-                ${prestamo.detalleAmortizacion.map((pago, indice) => `
+                ${detalleAmortizacion.map((pago, indice) => `
                     <tr>
                         <td>${indice + 1}</td>
                         <td>${pago.pagoMensual.toFixed(2)}</td>
@@ -100,15 +97,15 @@ function mostrarResultados(prestamo) {
             <tfoot>
                 <tr>
                     <td colspan="4">Total Préstamo sin Interés</td>
-                    <td>${prestamo.capital.toFixed(2)}</td>
+                    <td>${capital.toFixed(2)}</td>
                 </tr>
                 <tr>
                     <td colspan="4">Total Interés</td>
-                    <td>${prestamo.totalInteres.toFixed(2)}</td>
+                    <td>${totalInteres.toFixed(2)}</td>
                 </tr>
                 <tr>
                     <td colspan="4">Total Préstamo con Interés</td>
-                    <td>${prestamo.totalPago.toFixed(2)}</td>
+                    <td>${totalPago.toFixed(2)}</td>
                 </tr>
             </tfoot>
         </table>
@@ -128,6 +125,12 @@ function cargarResultados() {
         mostrarResultados(JSON.parse(prestamoGuardado));
     }
 }
+
+// Limpiar resultados en el DOM y localStorage
+document.getElementById('limpiarResultados').addEventListener('click', function() {
+    localStorage.removeItem('prestamoGuardado');
+    document.getElementById('resultados').innerHTML = ''; // Limpiar el DOM
+});
 
 // Ejecutar el simulador cuando se envíe el formulario
 document.getElementById('simuladorForm').addEventListener('submit', function(event) {
@@ -150,6 +153,4 @@ document.getElementById('simuladorForm').addEventListener('submit', function(eve
 });
 
 // Cargar resultados al iniciar la página
-window.onload = () => {
-    cargarResultados();
-};
+window.onload = cargarResultados;
